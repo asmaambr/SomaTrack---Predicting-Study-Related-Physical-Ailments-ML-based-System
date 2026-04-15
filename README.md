@@ -1,4 +1,4 @@
-# SomaTrack---Predicting-Study-Related-Physical-Ailments-ML-based-System
+# SomaTrack Predicting-Study-Related-Physical-Ailments-ML-based-System
 
 ## Overview
 
@@ -8,7 +8,7 @@ It models the relationship between daily study habits and the likelihood of expe
 
 The system is built as a multiclass classification model that estimates risk levels from user-provided inputs.
 
----
+ 
 
 ## Problem Definition
 
@@ -16,7 +16,7 @@ Prolonged study sessions, sedentary behavior, and suboptimal ergonomic condition
 
 SomaTrack addresses this by learning patterns that correlate study behaviors with reported physical strain levels, enabling predictive assessment of risk.
 
----
+ 
 
 ## Input Features
 
@@ -33,7 +33,7 @@ The model uses structured inputs describing study habits and environment.
 - Seating type (ergonomic chair, stool, plastic chair, bed)
 - Input device usage (mouse/keyboard vs trackpad)
 
----
+ 
 
 ## Output
 
@@ -44,7 +44,7 @@ The system predicts a **risk level of physical discomfort**:
 - 2 → Moderate Risk
 - 3 → High Risk
 
----
+ 
 
 ## Methodology
 
@@ -57,7 +57,7 @@ SomaTrack follows a standard supervised learning pipeline:
 - Model evaluation using classification metrics
 - Selection of the best-performing model
 
----
+ 
 
 ## Model Output Use Case
 
@@ -73,7 +73,7 @@ Example:
 **Output:**
 - Predicted Risk: High (Level 3)
 
----
+ 
 
 ## Evaluation Strategy
 
@@ -85,7 +85,7 @@ Model performance is assessed using:
 - Macro-averaged F1-score
 - Cross-validation for robustness
 
----
+ 
 
 ## Technologies
 
@@ -96,10 +96,10 @@ Model performance is assessed using:
 - Matplotlib
 - Seaborn
 
----
+ 
 
 ## Notes
 
 SomaTrack is a data-driven predictive system. Its outputs are probabilistic estimates based on observed behavioral patterns and should not be interpreted as medical diagnosis.
 
----
+ 
