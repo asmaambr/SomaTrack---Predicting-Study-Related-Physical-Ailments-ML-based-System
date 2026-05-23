@@ -1,106 +1,7 @@
 import { C } from "./constants.js";
 import { Blob } from "./components.jsx";
 
-// ─── SVG Student Illustration ─────────────────────────────────────────────────
-function StudentIllustration() {
-  return (
-    <svg viewBox="0 0 340 380" fill="none" xmlns="http://www.w3.org/2000/svg"
-      style={{ width: "100%", maxWidth: 340, filter: "drop-shadow(0 16px 40px rgba(52,183,136,0.18))" }}>
-      {/* Background circle */}
-      <circle cx="170" cy="200" r="160" fill={`${C.butter}`} opacity="0.7"/>
-      <circle cx="170" cy="200" r="130" fill={`${C.yellow}`} opacity="0.25"/>
 
-      {/* Desk */}
-      <rect x="40" y="270" width="260" height="16" rx="8" fill={C.greenDk} opacity="0.15"/>
-      <rect x="60" y="286" width="20" height="60" rx="4" fill={C.greenDk} opacity="0.12"/>
-      <rect x="260" y="286" width="20" height="60" rx="4" fill={C.greenDk} opacity="0.12"/>
-
-      {/* Laptop */}
-      <rect x="90" y="215" width="160" height="100" rx="10" fill="#E8F5E9" stroke={C.green} strokeWidth="2"/>
-      <rect x="95" y="220" width="150" height="85" rx="7" fill={C.greenDk} opacity="0.08"/>
-      {/* Screen content lines */}
-      <rect x="105" y="232" width="80" height="6" rx="3" fill={C.green} opacity="0.4"/>
-      <rect x="105" y="244" width="120" height="4" rx="2" fill={C.muted} opacity="0.3"/>
-      <rect x="105" y="254" width="100" height="4" rx="2" fill={C.muted} opacity="0.3"/>
-      <rect x="105" y="264" width="110" height="4" rx="2" fill={C.muted} opacity="0.3"/>
-      {/* Chart on screen */}
-      <rect x="195" y="250" width="12" height="20" rx="2" fill={C.green} opacity="0.5"/>
-      <rect x="210" y="242" width="12" height="28" rx="2" fill={C.blue} opacity="0.5"/>
-      <rect x="225" y="255" width="12" height="15" rx="2" fill={C.peach} opacity="0.5"/>
-      {/* Laptop base */}
-      <rect x="75" y="312" width="190" height="10" rx="5" fill={C.greenDk} opacity="0.15"/>
-
-      {/* Body / torso */}
-      <rect x="140" y="175" width="60" height="80" rx="20" fill="#FDDCB5"/>
-
-      {/* Shirt */}
-      <rect x="138" y="195" width="64" height="65" rx="18" fill={C.green} opacity="0.85"/>
-      {/* Shirt detail */}
-      <path d="M158 200 L170 215 L182 200" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.5"/>
-
-      {/* Arms */}
-      <path d="M138 210 C118 218 108 240 112 260" stroke="#FDDCB5" strokeWidth="18" strokeLinecap="round" fill="none"/>
-      <path d="M202 210 C222 218 232 240 228 260" stroke="#FDDCB5" strokeWidth="18" strokeLinecap="round" fill="none"/>
-      {/* Hands on keyboard */}
-      <ellipse cx="118" cy="264" rx="14" ry="10" fill="#FDDCB5"/>
-      <ellipse cx="222" cy="264" rx="14" ry="10" fill="#FDDCB5"/>
-
-      {/* Neck */}
-      <rect x="162" y="155" width="16" height="25" rx="8" fill="#FDDCB5"/>
-
-      {/* Head */}
-      <ellipse cx="170" cy="130" rx="42" ry="46" fill="#FDDCB5"/>
-
-      {/* Hair */}
-      <path d="M128 118 C128 80 212 80 212 118 C212 100 200 86 170 86 C140 86 128 100 128 118Z" fill={C.greenDk} opacity="0.85"/>
-      <ellipse cx="128" cy="125" rx="8" ry="14" fill={C.greenDk} opacity="0.85"/>
-      <ellipse cx="212" cy="125" rx="8" ry="14" fill={C.greenDk} opacity="0.85"/>
-
-      {/* Eyes */}
-      <ellipse cx="155" cy="128" rx="7" ry="8" fill="white"/>
-      <ellipse cx="185" cy="128" rx="7" ry="8" fill="white"/>
-      <circle cx="157" cy="130" r="4" fill={C.greenDk}/>
-      <circle cx="187" cy="130" r="4" fill={C.greenDk}/>
-      <circle cx="159" cy="128" r="1.5" fill="white"/>
-      <circle cx="189" cy="128" r="1.5" fill="white"/>
-
-      {/* Eyebrows */}
-      <path d="M148 119 C151 116 158 116 162 119" stroke={C.greenDk} strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-      <path d="M178 119 C181 116 188 116 191 119" stroke={C.greenDk} strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-
-      {/* Smile */}
-      <path d="M160 144 C164 150 176 150 180 144" stroke={C.peach} strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-
-      {/* Glasses */}
-      <rect x="147" y="122" width="20" height="14" rx="7" stroke={C.blueDk} strokeWidth="2" fill="none" opacity="0.6"/>
-      <rect x="173" y="122" width="20" height="14" rx="7" stroke={C.blueDk} strokeWidth="2" fill="none" opacity="0.6"/>
-      <line x1="167" y1="129" x2="173" y2="129" stroke={C.blueDk} strokeWidth="2" opacity="0.6"/>
-      <line x1="127" y1="126" x2="147" y2="126" stroke={C.blueDk} strokeWidth="2" opacity="0.6"/>
-      <line x1="193" y1="126" x2="213" y2="126" stroke={C.blueDk} strokeWidth="2" opacity="0.6"/>
-
-      {/* Floating decorations */}
-      <circle cx="58" cy="120" r="12" fill={C.yellow} opacity="0.6"/>
-      <circle cx="290" cy="150" r="8" fill={C.blue} opacity="0.5"/>
-      <circle cx="72" cy="180" r="6" fill={C.green} opacity="0.4"/>
-      <circle cx="298" cy="230" r="10" fill={C.peach} opacity="0.5"/>
-
-      {/* Stars */}
-      <text x="40" y="90" fontSize="18" opacity="0.5">✦</text>
-      <text x="295" y="100" fontSize="14" opacity="0.4">✦</text>
-      <text x="310" y="280" fontSize="12" opacity="0.4">✦</text>
-
-      {/* Pain indicator badges */}
-      <g transform="translate(285, 170)">
-        <circle r="20" fill={C.peach} opacity="0.9"/>
-        <text textAnchor="middle" y="6" fontSize="16">⚠️</text>
-      </g>
-      <g transform="translate(50, 210)">
-        <circle r="18" fill={C.blue} opacity="0.85"/>
-        <text textAnchor="middle" y="5" fontSize="14">🔍</text>
-      </g>
-    </svg>
-  );
-}
 
 // ─── Feature card SVG logos ───────────────────────────────────────────────────
 function LogoSmart() {
@@ -245,10 +146,16 @@ export default function HomePage({ onStart, onNavigate }) {
           </div>
         </div>
 
-        {/* Right: illustration */}
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <StudentIllustration />
-        </div>
+        <img
+  src="/student.png"
+  alt="student"
+  style={{
+    width: 400,           // fixed width in px         // fixed height in px
+    objectFit: "cover",   // crop nicely without stretching
+    borderRadius: 24,     // rounded corners
+    display: "block",     // removes weird bottom gap
+  }}
+/>
       </div>
 
       {/* Feature cards */}
