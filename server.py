@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json
+import os
 import warnings
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 import joblib
 import numpy as np
 import pandas as pd
@@ -16,9 +18,7 @@ except Exception:
     pass
 
 warnings.filterwarnings("ignore")
-
-
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parent
 MODELS_DIR = ROOT_DIR / "models"
 
 FINAL_MODEL_PATH = MODELS_DIR / "somaTrack_final_model.joblib"
@@ -731,7 +731,6 @@ def predict_payload(form: dict[str, Any]) -> dict[str, Any]:
         "eye_strain": symptom_data["eyestrain"]["flag"],
         "finger_numbness": estimate_finger_numbness(form, final_features.iloc[0].to_dict()),
         "pain_level": pain_level,
-        # overall_risk_score now comes from the trained final model
         "overall_risk_score": final_severity_pct,
         "back_pain_pct": back_pct,
         "neck_strain_pct": neck_pct,
@@ -750,57 +749,25 @@ def predict_payload(form: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-class ModelRequestHandler(BaseHTTPRequestHandler):
-    def _send_json(self, status: int, payload: dict[str, Any]) -> None:
-        body = json.dumps(payload).encode("utf-8")
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        self.end_headers()
-        self.wfile.write(body)
+app = FastAPI()
 
-    def do_OPTIONS(self) -> None:  # noqa: N802
-        self.send_response(204)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        self.end_headers()
-
-    def do_GET(self) -> None:  # noqa: N802
-        if self.path in {"/", "/health", "/api/health"}:
-            self._send_json(200, {
-                "status": "ok",
-                "models_loaded": True,
-                "feature_count": len(FEATURE_COLUMNS),
-            })
-            return
-        self._send_json(404, {"error": "Not found"})
-
-    def do_POST(self) -> None:  # noqa: N802
-        if self.path not in {"/api/predict", "/predict"}:
-            self._send_json(404, {"error": "Not found"})
-            return
-
-        try:
-            content_length = int(self.headers.get("Content-Length", "0"))
-            raw_body = self.rfile.read(content_length).decode("utf-8")
-            payload = json.loads(raw_body or "{}")
-            prediction = predict_payload(payload)
-            self._send_json(200, prediction)
-        except Exception as exc:  # pragma: no cover - surfaced to the frontend
-            self._send_json(500, {"error": str(exc)})
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
-def main() -> None:
-    port = 8001
-    server = ThreadingHTTPServer(("127.0.0.1", port), ModelRequestHandler)
-    print(f"SomaTrack model server listening on http://127.0.0.1:{port}")
-    print(f"Loaded {len(FEATURE_COLUMNS)} features from {FINAL_MODEL_PATH.name}")
-    server.serve_forever()
+@app.get("/health")
+async def health() -> dict[str, str]:
+    return {"status": "ok"}
 
 
-if __name__ == "__main__":
-    main()
+@app.post("/api/predict")
+async def api_predict(request: Request) -> dict[str, Any]:
+    payload = await request.json()
+    if not isinstance(payload, dict):
+        payload = {}
+    return predict_payload(payload)
