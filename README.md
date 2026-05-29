@@ -102,4 +102,31 @@ Model performance is assessed using:
 
 SomaTrack is a data-driven predictive system. Its outputs are probabilistic estimates based on observed behavioral patterns and should not be interpreted as medical diagnosis.
 
+## Deployment
+
+This project is set up for a split deployment:
+
+- Frontend: Vercel, using the `somatrack-app` folder.
+- Backend: Render, using the FastAPI app in the repository root.
+
+### Render backend
+
+1. Create a new Web Service on Render from this repository.
+2. Use the repo root as the service root.
+3. Install dependencies with `pip install -r requirements.txt`.
+4. Start the service with `uvicorn server:app --host 0.0.0.0 --port $PORT`.
+5. Keep the health check path as `/health`.
+
+### Vercel frontend
+
+1. Create a new Vercel project from the `somatrack-app` directory.
+2. Set the environment variable `VITE_API_BASE_URL` to your Render backend URL, for example `https://your-service.onrender.com`.
+3. Deploy using the default Vite build command `npm run build`.
+
+### Local development
+
+- Frontend: `cd somatrack-app && npm install && npm run dev`
+- Backend: `python server.py`
+- If you want the frontend to call a local backend, set `VITE_API_BASE_URL` to your local API URL.
+
  

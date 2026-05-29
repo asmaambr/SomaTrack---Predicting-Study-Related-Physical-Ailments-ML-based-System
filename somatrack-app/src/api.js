@@ -1,6 +1,7 @@
 // ─── Local ML API ─────────────────────────────────────────────────────────────
 export async function getPrediction(formData) {
-  const response = await fetch("/api/predict", {
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "";
+  const response = await fetch(`${apiBaseUrl}/api/predict`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(formData),
