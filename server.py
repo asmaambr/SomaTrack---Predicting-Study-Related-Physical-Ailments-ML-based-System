@@ -1,23 +1,26 @@
 from __future__ import annotations
 
-import json
-import os
 import warnings
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 import joblib
 import numpy as np
 import pandas as pd
-
-try:
-    warnings.filterwarnings("ignore")
-except Exception:
-    pass
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 
 warnings.filterwarnings("ignore")
+
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 ROOT_DIR = Path(__file__).resolve().parent
 MODELS_DIR = ROOT_DIR / "models"
 
@@ -47,10 +50,6 @@ def to_float(value: Any, default: float = 0.0) -> float:
         return float(str(value).replace(",", "."))
     except Exception:
         return default
-
-
-def clamp(value: float, lower: float, upper: float) -> float:
-    return max(lower, min(upper, value))
 
 
 def one_hot(prefix: str, selected: str, columns: list[str]) -> dict[str, int]:
@@ -83,9 +82,7 @@ def map_seat(value: Any) -> dict[str, int]:
         selected = "seat_Plastic chair (standard)"
     elif text == "sofa/couch":
         selected = "seat_Sofa / couch"
-    elif text == "floor":
-        selected = "seat_Bed / floor (no chair)"
-    elif text == "bed":
+    elif text in {"floor", "bed"}:
         selected = "seat_Bed / floor (no chair)"
     elif text == "standing desk":
         selected = "seat_Other"
@@ -643,7 +640,6 @@ def predict_payload(form: dict[str, Any]) -> dict[str, Any]:
     predicted_pain_class = int(pain_classes[int(np.argmax(final_probs))])
     max_pain_class = float(np.max(pain_classes)) or 1.0
     pain_level = int(np.clip(round((predicted_pain_class / max_pain_class) * 10), 0, 10))
-    # Derive an overall risk score from the final model's ordinal prediction
     final_severity_pct = ordinal_percentage(final_probs, pain_classes)
 
     symptom_specs = {
@@ -667,7 +663,6 @@ def predict_payload(form: dict[str, Any]) -> dict[str, Any]:
             "pct_key": pct_key,
         }
 
-    # Use the target models' ordinal severity percentage as the pain-type outputs
     back_pct = symptom_data["back"]["severity_pct"]
     neck_pct = symptom_data["neck"]["severity_pct"]
     head_pct = symptom_data["headache"]["severity_pct"]
@@ -749,19 +744,13 @@ def predict_payload(form: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
 @app.get("/health")
 async def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+
+@app.get("/api/health")
+async def api_health() -> dict[str, str]:
     return {"status": "ok"}
 
 
