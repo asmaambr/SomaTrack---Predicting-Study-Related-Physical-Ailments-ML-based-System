@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import warnings
 from pathlib import Path
+import os
 from typing import Any
 
 import joblib
@@ -37,6 +38,12 @@ TARGET_MODELS = {name: joblib.load(path) for name, path in TARGET_MODEL_PATHS.it
 
 FEATURE_COLUMNS = list(FINAL_MODEL.named_steps["imputer"].feature_names_in_)
 TARGET_FEATURE_COLUMNS = list(TARGET_MODELS["back"].named_steps["preprocess"].feature_names_in_)
+
+try:
+    print(f"[server] Loaded FINAL_MODEL from {FINAL_MODEL_PATH}; FEATURE_COLUMNS={len(FEATURE_COLUMNS)} sample={FEATURE_COLUMNS[:10]}")
+    print(f"[server] Loaded TARGET_MODEL keys: {list(TARGET_MODELS.keys())}; TARGET_FEATURE_COLUMNS={len(TARGET_FEATURE_COLUMNS)} sample={TARGET_FEATURE_COLUMNS[:10]}")
+except Exception:
+    pass
 
 
 def normalize_text(value: Any) -> str:
@@ -631,7 +638,7 @@ def build_feature_row(form: dict[str, Any]) -> pd.DataFrame:
     return pd.DataFrame([row], columns=FEATURE_COLUMNS)
 
 
-def predict_payload(form: dict[str, Any]) -> dict[str, Any]:
+def predict_payload(form: dict[str, Any], debug: bool = False) -> dict[str, Any]:
     target_features = build_target_features(form)
     final_features = build_feature_row(form)
 
@@ -718,7 +725,7 @@ def predict_payload(form: dict[str, Any]) -> dict[str, Any]:
 
     top_tips = tips[:3]
 
-    return {
+    result = {
         "back_pain": symptom_data["back"]["flag"],
         "neck_strain": symptom_data["neck"]["flag"],
         "tension_headaches": symptom_data["headache"]["flag"],
@@ -743,6 +750,20 @@ def predict_payload(form: dict[str, Any]) -> dict[str, Any]:
         "top_tips": top_tips,
     }
 
+    if debug or os.getenv("DEBUG_PREDICTION") == "1":
+        try:
+            result["_debug"] = {
+                "final_probs": final_probs.tolist(),
+                "pain_classes": pain_classes.tolist(),
+                "predicted_pain_class": int(predicted_pain_class),
+                "final_features": final_features.to_dict(orient="records")[0],
+                "target_features": target_features.to_dict(orient="records")[0],
+            }
+        except Exception:
+            result["_debug"] = {"note": "failed to serialize debug info"}
+
+    return result
+
 
 @app.get("/health")
 async def health() -> dict[str, str]:
@@ -759,4 +780,5 @@ async def api_predict(request: Request) -> dict[str, Any]:
     payload = await request.json()
     if not isinstance(payload, dict):
         payload = {}
-    return predict_payload(payload)
+    debug_flag = bool(payload.get("debug", False)) or os.getenv("DEBUG_PREDICTION") == "1"
+    return predict_payload(payload, debug=debug_flag)
