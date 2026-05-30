@@ -24,11 +24,39 @@ function PainBar({ label, icon, pct, color, desc }) {
 }
 
 // ─── ResultsPage ──────────────────────────────────────────────────────────────
-export default function ResultsPage({ results, onRestart }) {
-  if (!results) return null;
+export default function ResultsPage({ results, error, onRestart, onRetry }) {
+  if (!results) {
+    return (
+      <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Nunito', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ maxWidth: 640, width: "100%", background: C.card, borderRadius: 28, padding: 32, border: "2px solid #F3D2D2", boxShadow: "0 10px 30px rgba(0,0,0,0.06)" }}>
+          <div style={{ fontSize: 14, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.1, color: "#C0392B", marginBottom: 10 }}>
+            Local model unavailable
+          </div>
+          <h2 style={{ fontSize: 28, fontWeight: 900, color: C.text, margin: "0 0 12px" }}>
+            Could not load a live prediction
+          </h2>
+          <p style={{ margin: 0, lineHeight: 1.7, color: C.muted, fontSize: 15 }}>
+            {error || "The app could not reach the local FastAPI server. Start the backend, then try again."}
+          </p>
+          <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
+            <button onClick={onRetry} style={{ padding: "12px 20px", borderRadius: 28, border: "none", background: `linear-gradient(135deg, ${C.green}, ${C.blueDk})`, color: "#fff", fontWeight: 800, cursor: "pointer", fontFamily: "'Nunito', sans-serif" }}>
+              Try again
+            </button>
+            <button onClick={onRestart} style={{ padding: "12px 20px", borderRadius: 28, border: "2px solid #E0E0E0", background: C.card, color: C.text, fontWeight: 800, cursor: "pointer", fontFamily: "'Nunito', sans-serif" }}>
+              Back to home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // overall risk should come from the final model (percentage 0-100)
-  const overallPct = results.overall_risk_score ?? 0;
+  const overallPct = Number.isFinite(Number(results.overall_risk_score))
+    ? Number(results.overall_risk_score)
+    : Number.isFinite(Number(results.pain_level))
+      ? Number(results.pain_level) * 10
+      : 0;
   const pl = Math.round(overallPct / 10);
   const plColor = overallPct <= 30 ? C.green : overallPct <= 60 ? C.peach : "#E74C3C";
   const plLabel = overallPct <= 30 ? "Low Risk" : overallPct <= 60 ? "Moderate Risk" : "High Risk";

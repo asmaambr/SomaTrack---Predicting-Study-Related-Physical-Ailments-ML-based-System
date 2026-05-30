@@ -23,7 +23,7 @@ import PomodoroPage from "./PomodoroPage.jsx";
 import { Navbar } from "./components.jsx";
 
 // Import API helpers
-import { getPrediction, mockResults } from "./api.js";
+import { getPrediction } from "./api.js";
 
 // Google font
 const fontLink = "https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap";
@@ -31,24 +31,30 @@ const fontLink = "https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;6
 export default function App() {
   const [page,    setPage]    = useState("home");   // home | form | loading | results | pomodoro
   const [results, setResults] = useState(null);
+  const [error,   setError]   = useState("");
 
   // Pages that show the top navbar
   const showNav = ["home", "form", "results", "pomodoro"].includes(page);
 
   const navigate = (target) => {
     // When navigating to form, reset results
-    if (target === "form") setResults(null);
+    if (target === "form") {
+      setResults(null);
+      setError("");
+    }
     setPage(target);
   };
 
   const handleFormSubmit = async (formData) => {
+    setError("");
     setPage("loading");
     try {
       const res = await getPrediction(formData);
       setResults(res);
     } catch (err) {
-      console.error("API error, using fallback:", err);
-      setResults(mockResults);
+      console.error("API error:", err);
+      setResults(null);
+      setError(err instanceof Error ? err.message : "Unable to reach the local model server.");
     }
     setPage("results");
   };
@@ -75,7 +81,7 @@ export default function App() {
       {page === "home"     && <HomePage     onStart={() => navigate("form")} onNavigate={navigate} />}
       {page === "form"     && <FormPage     onResults={handleFormSubmit} />}
       {page === "loading"  && <LoadingPage  />}
-      {page === "results"  && <ResultsPage  results={results} onRestart={() => navigate("home")} />}
+      {page === "results"  && <ResultsPage  results={results} error={error} onRestart={() => navigate("home")} onRetry={() => navigate("form")} />}
       {page === "pomodoro" && <PomodoroPage />}
     </>
   );

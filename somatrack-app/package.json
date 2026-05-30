@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "api": "conda run -p /home/asmaa/anaconda3/envs/DM_ENV python server.py",
+    "dev": "sh -c 'if lsof -i :8000 -P -n >/dev/null 2>&1; then vite; else concurrently -k \"npm:api\" \"vite\"; fi'",
+    "api": "cd .. && conda run -p /home/asmaa/anaconda3/envs/DM_ENV uvicorn server:app --host 127.0.0.1 --port 8000 --reload",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -19,6 +19,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^10.0.0",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
